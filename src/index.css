@@ -66,4 +66,31 @@
   .card-premium {
     @apply bg-white rounded-3xl border border-gray-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03),0_10px_20px_-2px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)];
   }
+
+  /* Chat widget: mobile → right-bottom, desktop → left-bottom */
+  .chat-widget-pos {
+    /* Mobile / Tablet */
+    bottom: 88px;
+    right: 16px;
+    left: auto;
+    width: min(360px, calc(100vw - 32px));
+    height: min(62vh, 580px);
+    min-height: 380px;
+    border-radius: 24px;
+    background: #fff;
+    border: 1px solid rgba(21,128,61,0.12);
+    box-shadow: 0 20px 60px -10px rgba(0,0,0,0.18), 0 4px 20px -5px rgba(21,128,61,0.12);
+  }
+
+  @media (min-width: 768px) {
+    .chat-widget-pos {
+      /* Desktop */
+      bottom: 24px;
+      left: 24px;
+      right: auto;
+      width: 440px;
+      height: 620px;
+      min-height: 420px;
+    }
+  }
 }
