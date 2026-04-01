@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 // Premium SVG sticker-like elements for Crops instead of basic Emojis
 export const WheatIcon = ({ className }: { className?: string }) => (

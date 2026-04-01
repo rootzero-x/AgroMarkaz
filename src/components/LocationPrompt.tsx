@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { MapPin, Loader2, AlertTriangle, X } from 'lucide-react';
+import { MapPin, Loader2, AlertTriangle } from 'lucide-react';
 
 interface LocationPromptProps {
   onGranted: (lat: number, lon: number) => void;
