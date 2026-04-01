@@ -73,8 +73,8 @@ const Weather: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.get(`/api/weather?lat=${lat}&lon=${lon}`);
-      setWeather(res.data);
+      const res = await api.get(`/weather?lat=${lat}&lon=${lon}`);
+      setWeather(res.data.weather ?? res.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ob-havo ma\'lumotlarini yuklab bo\'lmadi.');
     } finally {
@@ -93,33 +93,40 @@ const Weather: React.FC = () => {
     setShowLocationPrompt(false);
   };
 
+  /* ── Always-rendered LocationPrompt portal ────────── */
+  const locationPromptEl = (
+    <AnimatePresence>
+      {showLocationPrompt && (
+        <LocationPrompt
+          onGranted={handleLocationGranted}
+          onSkip={() => setShowLocationPrompt(false)}
+        />
+      )}
+    </AnimatePresence>
+  );
+
   /* ── No location state ──────────────────────────── */
-  if (!userLocation && !showLocationPrompt) {
+  if (!userLocation) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <div className="w-20 h-20 rounded-3xl bg-primary-50 border border-primary-100 flex items-center justify-center mb-5 text-4xl shadow-sm">
-          🌍
-        </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Joylashuvingiz kerak</h2>
-        <p className="text-sm text-gray-500 max-w-xs mb-6 leading-relaxed">
-          Ob-havo ma'lumotlarini ko'rish uchun joylashuvingizga ruxsat bering.
-        </p>
-        <button
-          onClick={() => setShowLocationPrompt(true)}
-          className="px-6 py-3 rounded-xl font-semibold text-white text-sm transition-all active:scale-95 shadow-md shadow-primary-200"
-          style={{ background: 'linear-gradient(135deg, #15803d, #16a34a)' }}
-        >
-          Joylashuvni ulash
-        </button>
-        <AnimatePresence>
-          {showLocationPrompt && (
-            <LocationPrompt
-              onGranted={handleLocationGranted}
-              onSkip={() => setShowLocationPrompt(false)}
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <>
+        {locationPromptEl}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
+          <div className="w-20 h-20 rounded-3xl bg-primary-50 border border-primary-100 flex items-center justify-center mb-5 text-4xl shadow-sm">
+            🌍
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Joylashuvingiz kerak</h2>
+          <p className="text-sm text-gray-500 max-w-xs mb-6 leading-relaxed">
+            Ob-havo ma'lumotlarini ko'rish uchun joylashuvingizga ruxsat bering.
+          </p>
+          <button
+            onClick={() => setShowLocationPrompt(true)}
+            className="px-6 py-3 rounded-xl font-semibold text-white text-sm transition-all active:scale-95 shadow-md shadow-primary-200"
+            style={{ background: 'linear-gradient(135deg, #15803d, #16a34a)' }}
+          >
+            Joylashuvni ulash
+          </button>
+        </motion.div>
+      </>
     );
   }
 
