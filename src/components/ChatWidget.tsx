@@ -150,11 +150,10 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                 className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 <div
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mb-0.5 ${
-                    msg.role === 'assistant'
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mb-0.5 ${msg.role === 'assistant'
                       ? 'bg-primary-100 border border-primary-200'
                       : 'bg-gray-200 border border-gray-300'
-                  }`}
+                    }`}
                 >
                   {msg.role === 'assistant' ? (
                     <Bot className="w-3.5 h-3.5 text-primary-600" />
@@ -163,16 +162,14 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                   )}
                 </div>
                 <div
-                  className={`max-w-[75%] flex flex-col gap-1 ${
-                    msg.role === 'user' ? 'items-end' : 'items-start'
-                  }`}
+                  className={`max-w-[75%] flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'
+                    }`}
                 >
                   <div
-                    className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                      msg.role === 'user'
+                    className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
                         ? 'text-white rounded-br-sm'
                         : 'text-gray-800 bg-white border border-gray-100 shadow-sm rounded-bl-sm'
-                    }`}
+                      }`}
                     style={
                       msg.role === 'user'
                         ? { background: 'linear-gradient(135deg, #15803d, #16a34a)' }
@@ -235,9 +232,6 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                 )}
               </button>
             </div>
-            <p className="text-[10px] text-gray-400 text-center mt-2">
-              AI javoblari ma'lumotnoma uchun. Mutaxassis bilan maslahatlashing.
-            </p>
           </div>
         </motion.div>
       )}
