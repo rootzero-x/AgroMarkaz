@@ -46,6 +46,64 @@ const formatMoney = (amount: number) => {
   return new Intl.NumberFormat('uz-UZ').format(amount) + " so'm";
 };
 
+const renderYieldChart = (forecastStr: string, avgVal: number) => {
+  let min = avgVal * 0.8;
+  let max = avgVal * 1.2;
+  // Try parsing something like "45-60 tonna/gektar"
+  const nums = forecastStr.match(/\d+(\.\d+)?/g);
+  if (nums && nums.length >= 2) {
+    min = parseFloat(nums[0]);
+    max = parseFloat(nums[1]);
+  } else if (nums && nums.length === 1) {
+    min = parseFloat(nums[0]);
+    max = avgVal > min ? avgVal + (avgVal - min) : min * 1.2;
+  }
+  
+  if (isNaN(min)) min = 0; 
+  if (isNaN(max)) max = avgVal * 1.2;
+  
+  const maxScale = Math.max(max * 1.15, avgVal * 1.15); // Add breathing room
+
+  const bars = [
+    { label: "Minimal (Xavf darajasi)", val: min, color: "bg-slate-400" },
+    { label: "O'rtacha (Barqaror holda)", val: avgVal, color: "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.4)] z-10" },
+    { label: "Maksimal (Optimal sharoit)", val: max, color: "bg-emerald-500" }
+  ];
+
+  return (
+    <div className="mt-6 pt-5 border-t border-slate-200/80 w-full overflow-hidden">
+      <h5 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <TrendingUp className="w-3.5 h-3.5" /> Hosildorlik Grafik Tahlili (gektar/tonna)
+      </h5>
+      <div className="space-y-3.5 w-full">
+        {bars.map((item, i) => {
+          const percentage = Math.min(100, (item.val / maxScale) * 100);
+          return (
+            <div key={i} className="flex items-center gap-3 w-full group">
+              <div className="w-[105px] sm:w-[130px] text-[10px] sm:text-[11px] font-bold text-slate-600 truncate shrink-0" title={item.label}>
+                {item.label}
+              </div>
+              <div className="flex-1 h-2.5 sm:h-3 bg-slate-200/70 rounded-full overflow-hidden relative">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${percentage}%` }}
+                  viewport={{ once: true, margin: "-20px" }}
+                  transition={{ duration: 1.2, delay: i * 0.15, ease: 'easeOut' }}
+                  className={`h-full rounded-r-full ${item.color} group-hover:brightness-110 transition-all`}
+                />
+              </div>
+              <div className="w-12 sm:w-16 text-right font-mono text-[11px] sm:text-[13px] font-bold text-slate-800 shrink-0">
+                {item.val} <span className="text-[9px] sm:text-[10px] text-slate-400">t</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+
 const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [hudud, setHudud] = useState('');
   const [yerHajmi, setYerHajmi] = useState<string>('25');
@@ -90,11 +148,11 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       initial={{ opacity: 0, x: 20 }} 
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="space-y-6"
+      className="space-y-6 max-w-[100vw] overflow-x-hidden p-2 sm:p-0"
     >
       <button 
         onClick={onBack}
-        className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm w-fit"
+        className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm w-fit active:scale-95"
       >
         <ArrowLeft className="w-4 h-4" /> Ortga qaytish
       </button>
@@ -113,7 +171,7 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Form Panel (Left) */}
-        <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-24">
+        <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-24 w-full">
           <div className="card-premium p-6 md:p-7">
             <h2 className="text-[19px] font-bold text-gray-900 mb-6 font-display">Ma'lumotlarni kiriting</h2>
             
@@ -203,7 +261,7 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <button
                 onClick={handleAnalyze}
                 disabled={!isFormValid || loading}
-                className={`w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 ${
+                className={`w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.98] ${
                   isFormValid && !loading
                     ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/30' 
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -222,7 +280,7 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
 
         {/* Results Panel (Right) */}
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-8 w-full max-w-full overflow-hidden">
           <AnimatePresence mode="wait">
             
             {/* Initial State */}
@@ -273,7 +331,7 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-5"
               >
-                <div className="flex items-center justify-between card-premium p-5 mb-2">
+                <div className="flex items-center justify-between card-premium p-5 mb-2 border-b-4 border-primary-500 rounded-3xl">
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">Tahlil natijalari</h2>
                     <p className="text-[13px] text-gray-500">{results.length} ta mos ekin topildi</p>
@@ -295,7 +353,7 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     
                     {/* Crop Header */}
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
-                      <div>
+                      <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2 flex-wrap">
                           <h3 className="text-2xl font-bold text-gray-900 font-display capitalize">{crop.ekin_nomi}</h3>
                           <span className={`px-2.5 py-1 rounded-[10px] text-[11px] font-bold uppercase tracking-wide
@@ -351,22 +409,27 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       </div>
                     </div>
 
-                    {/* Hosildorlik Tahlili (Yangi qo'shilgan) */}
+                    {/* Hosildorlik Tahlili & Diagramma */}
                     {crop.hosildorlik_tahlili && (
-                      <div className="mb-6 bg-slate-50/50 rounded-2xl p-4 sm:p-5 border border-slate-200 flex flex-col sm:flex-row gap-4">
-                        <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-100 text-slate-600 shrink-0 self-start">
-                          <BarChart3 className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h4 className="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Hosildorlik Tahlili</h4>
-                            <span className="bg-white text-slate-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200">
-                              O'rtacha {crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar} t/ga
-                            </span>
+                      <div className="mb-6 bg-slate-50/50 rounded-2xl p-4 sm:p-5 border border-slate-200">
+                        <div className="flex flex-col sm:flex-row gap-4 w-full">
+                          <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-100 text-slate-600 shrink-0 self-start">
+                            <BarChart3 className="w-5 h-5" />
                           </div>
-                          <p className="text-[14px] text-slate-600 leading-relaxed font-medium">
-                            {crop.hosildorlik_tahlili.tahlil}
-                          </p>
+                          <div className="flex-1 w-full min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <h4 className="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Hosildorlik Tahlili</h4>
+                              <span className="bg-white text-slate-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200">
+                                O'rtacha {crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar} t/ga
+                              </span>
+                            </div>
+                            <p className="text-[14px] text-slate-600 leading-relaxed font-medium">
+                              {crop.hosildorlik_tahlili.tahlil}
+                            </p>
+                            
+                            {/* Animated Responsive Chart */}
+                            {renderYieldChart(crop.prognoz_hosil, crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar)}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -419,65 +482,75 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 const Recommendation: React.FC = () => {
   const [activeModule, setActiveModule] = useState<string | null>(null);
 
-  if (activeModule === 'ai_planner') {
-    return <AIPlannerModule onBack={() => setActiveModule(null)} />;
-  }
-
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-      
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Tavsiyalar markazi</h1>
-          <p className="text-gray-500 max-w-xl">
-            Sizning yeringiz uchun qishloq xo'jaligi ekspertlaridan turli xil ilg'or tavsiyalar va yechimlar.
-          </p>
-        </div>
-      </div>
+      {!activeModule && (
+        <AnimatePresence mode="wait">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -10 }} 
+            className="space-y-8"
+          >
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Tavsiyalar markazi</h1>
+                <p className="text-gray-500 max-w-xl">
+                  Sizning yeringiz uchun qishloq xo'jaligi ekspertlaridan turli xil ilg'or tavsiyalar va yechimlar markazi.
+                </p>
+              </div>
+            </div>
 
-      {/* Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Module Card: AI Planner */}
-        <button 
-          onClick={() => setActiveModule('ai_planner')}
-          className="group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 hover:border-primary-200 transition-all hover:shadow-primary-600/5 relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50/50 rounded-bl-full -z-10 group-hover:bg-primary-50 transition-colors"></div>
-          <div className="bg-primary-50 p-3 rounded-2xl text-primary-600 border border-primary-100 group-hover:scale-110 transition-transform">
-            <Brain className="w-7 h-7" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-              AI Agronom <span className="bg-primary-100 text-primary-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Yangi</span>
-            </h3>
-            <p className="text-[14px] text-gray-500 leading-relaxed h-12">
-              Sun'iy intellekt yordamida yeringizga eng mos va serdaromad ekinlarni aniqlang.
-            </p>
-          </div>
-          <div className="mt-4 flex items-center gap-2 text-sm font-bold text-primary-600 group-hover:text-primary-700">
-            Ishga tushirish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </button>
+            {/* Modules Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* Module Card: AI Planner */}
+              <button 
+                onClick={() => setActiveModule('ai_planner')}
+                className="group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 hover:border-primary-200 transition-all hover:shadow-primary-600/5 relative overflow-hidden active:scale-95"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50/50 rounded-bl-full -z-10 group-hover:bg-primary-50 transition-colors"></div>
+                <div className="bg-primary-50 p-3 rounded-2xl text-primary-600 border border-primary-100 group-hover:scale-110 transition-transform">
+                  <Brain className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+                    AI Agronom <span className="bg-primary-100 text-primary-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Yangi</span>
+                  </h3>
+                  <p className="text-[14px] text-gray-500 leading-relaxed h-12">
+                    Sun'iy intellekt yordamida yeringizga eng mos va serdaromad ekinlarni aniqlang.
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center gap-2 text-sm font-bold text-primary-600 group-hover:text-primary-700">
+                  Ishga tushirish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
 
-        {/* Placeholder Module 2 */}
-        <div className="opacity-60 cursor-not-allowed group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 border-dashed relative overflow-hidden">
-          <div className="bg-gray-100 p-3 rounded-2xl text-gray-400 border border-gray-200">
-            <BarChart3 className="w-7 h-7" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Hosildorlik Tahlili</h3>
-            <p className="text-[14px] text-gray-500 leading-relaxed h-12">
-              O'tgan yillardagi hosil ma'lumotlaringiz asosida kelajak prognozlari.
-            </p>
-          </div>
-           <div className="mt-4 flex items-center gap-2 text-sm font-bold text-gray-400">
-            Tez orada
-          </div>
-        </div>
+              {/* Placeholder Module 2 */}
+              <div className="opacity-60 cursor-not-allowed group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 border-dashed relative overflow-hidden">
+                <div className="bg-gray-100 p-3 rounded-2xl text-gray-400 border border-gray-200">
+                  <BarChart3 className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Hosildorlik Tahlili</h3>
+                  <p className="text-[14px] text-gray-500 leading-relaxed h-12">
+                    O'tgan yillardagi hosil ma'lumotlaringiz asosida kelajak prognozlari.
+                  </p>
+                </div>
+                 <div className="mt-4 flex items-center gap-2 text-sm font-bold text-gray-400">
+                  Tez orada
+                </div>
+              </div>
 
-      </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+
+      {activeModule === 'ai_planner' && (
+        <AIPlannerModule onBack={() => setActiveModule(null)} />
+      )}
 
     </div>
   );
