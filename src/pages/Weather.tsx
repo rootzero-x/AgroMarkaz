@@ -371,11 +371,6 @@ const Weather: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Data source note */}
-      <p className="text-center text-[11px] text-gray-300 pb-4">
-        Ma'lumot manbai: Meteosource API · {weather.timezone}
-      </p>
-
       <AnimatePresence>
         {showLocationPrompt && (
           <LocationPrompt
