@@ -24,9 +24,9 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAuthenticated: false,
   userLocation: null,
-  login: () => {},
-  logout: () => {},
-  setUserLocation: () => {},
+  login: () => { },
+  logout: () => { },
+  setUserLocation: () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -81,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Real API integration
       const res = await api.get('/auth/me');
-      
+
       // Assume response.data contains the user object or response.data.user
       const userData = res.data.user || res.data;
       setUser(userData);
