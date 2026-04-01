@@ -19,8 +19,7 @@ const Profile: React.FC = () => {
     setLocationLoading(true);
     setLocationError('');
     fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${userLocation.lat}&lon=${userLocation.lon}&format=json&accept-language=uz`,
-      { headers: { 'User-Agent': 'AgroMarkaz/1.0' } }
+      `https://nominatim.openstreetmap.org/reverse?lat=${userLocation.lat}&lon=${userLocation.lon}&format=json&accept-language=uz&email=info@agromarkaz.uz`
     )
       .then((r) => r.json())
       .then((data) => {

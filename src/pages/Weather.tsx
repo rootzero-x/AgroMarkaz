@@ -10,18 +10,18 @@ import {
 
 /* ── Weather icon map ─────────────────────────────── */
 const weatherMeta: Record<string, { emoji: string; color: string; bg: string }> = {
-  sunny:          { emoji: '☀️',  color: '#f59e0b', bg: 'from-amber-50 to-orange-50' },
-  mostly_sunny:   { emoji: '🌤️',  color: '#f59e0b', bg: 'from-amber-50 to-yellow-50' },
-  partly_sunny:   { emoji: '⛅',  color: '#64748b', bg: 'from-blue-50 to-sky-50' },
-  mostly_cloudy:  { emoji: '🌥️',  color: '#64748b', bg: 'from-slate-50 to-gray-50' },
-  cloudy:         { emoji: '☁️',  color: '#6b7280', bg: 'from-gray-50 to-slate-50' },
-  overcast:       { emoji: '🌫️',  color: '#6b7280', bg: 'from-gray-100 to-slate-100' },
-  rain:           { emoji: '🌧️',  color: '#3b82f6', bg: 'from-blue-50 to-indigo-50' },
-  drizzle:        { emoji: '🌦️',  color: '#3b82f6', bg: 'from-blue-50 to-sky-50' },
-  snow:           { emoji: '❄️',  color: '#7dd3fc', bg: 'from-sky-50 to-blue-50' },
-  thunderstorm:   { emoji: '⛈️',  color: '#7c3aed', bg: 'from-violet-50 to-purple-50' },
-  partly_clear:   { emoji: '🌙',  color: '#8b5cf6', bg: 'from-indigo-50 to-violet-50' },
-  clear:          { emoji: '🌑',  color: '#475569', bg: 'from-slate-50 to-gray-50' },
+  sunny: { emoji: '☀️', color: '#f59e0b', bg: 'from-amber-50 to-orange-50' },
+  mostly_sunny: { emoji: '🌤️', color: '#f59e0b', bg: 'from-amber-50 to-yellow-50' },
+  partly_sunny: { emoji: '⛅', color: '#64748b', bg: 'from-blue-50 to-sky-50' },
+  mostly_cloudy: { emoji: '🌥️', color: '#64748b', bg: 'from-slate-50 to-gray-50' },
+  cloudy: { emoji: '☁️', color: '#6b7280', bg: 'from-gray-50 to-slate-50' },
+  overcast: { emoji: '🌫️', color: '#6b7280', bg: 'from-gray-100 to-slate-100' },
+  rain: { emoji: '🌧️', color: '#3b82f6', bg: 'from-blue-50 to-indigo-50' },
+  drizzle: { emoji: '🌦️', color: '#3b82f6', bg: 'from-blue-50 to-sky-50' },
+  snow: { emoji: '❄️', color: '#7dd3fc', bg: 'from-sky-50 to-blue-50' },
+  thunderstorm: { emoji: '⛈️', color: '#7c3aed', bg: 'from-violet-50 to-purple-50' },
+  partly_clear: { emoji: '🌙', color: '#8b5cf6', bg: 'from-indigo-50 to-violet-50' },
+  clear: { emoji: '🌑', color: '#475569', bg: 'from-slate-50 to-gray-50' },
 };
 
 const getMeta = (weather: string) =>
@@ -66,6 +66,7 @@ const Weather: React.FC = () => {
   const [error, setError] = useState('');
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [hourlyStart, setHourlyStart] = useState(0);
+  const [locationName, setLocationName] = useState('');
 
   const HOURLY_VISIBLE = 6;
 
@@ -74,7 +75,24 @@ const Weather: React.FC = () => {
     setError('');
     try {
       const res = await api.get(`/weather?lat=${lat}&lon=${lon}`);
-      setWeather(res.data.weather ?? res.data);
+      const weatherData = res.data.weather ?? res.data;
+      setWeather(weatherData);
+
+      // Reverse geocoding (Nominatim) for actual city name
+      fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=uz&email=info@agromarkaz.uz`
+      )
+        .then((r) => r.json())
+        .then((data) => {
+          const a = data.address || {};
+          const cityRegion = [
+            a.village || a.town || a.city || a.county || '',
+            a.state || a.region || '',
+            a.country || '',
+          ].filter(Boolean);
+          setLocationName(cityRegion.join(', ') || data.display_name || weatherData.timezone);
+        })
+        .catch(() => setLocationName(weatherData.timezone));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ob-havo ma\'lumotlarini yuklab bo\'lmadi.');
     } finally {
@@ -179,7 +197,9 @@ const Weather: React.FC = () => {
           <h1 className="text-xl md:text-2xl font-bold text-gray-900">Ob-Havo</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <MapPin className="w-3.5 h-3.5 text-primary-500" />
-            <span className="text-xs text-gray-400 font-medium">{weather.timezone}</span>
+            <span className="text-xs text-gray-400 font-medium">
+              {locationName || weather.timezone || 'Manzil aniqlanmoqda...'}
+            </span>
           </div>
         </div>
         <button
