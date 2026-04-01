@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f1f8ee;
+  --color-primary-100: #e0f0da;
+  --color-primary-200: #c1e1b7;
+  --color-primary-300: #9bcc8d;
+  --color-primary-400: #74b263;
+  --color-primary-500: #559643;
+  --color-primary-600: #4B8937;
+  --color-primary-700: #3b6c2c;
+  --color-primary-800: #325626;
+  --color-primary-900: #294721;
+  --color-primary-950: #152910;
+  --color-surface: #F5F7F6;
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  --shadow-premium: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 3px rgba(0,0,0,0.02);
+  --shadow-premium-hover: 0 10px 30px -4px rgba(75, 137, 55, 0.15), 0 4px 10px rgba(0,0,0,0.04);
+}
+
+@layer base {
+  html, body {
+    @apply h-full w-full overflow-hidden bg-surface m-0 p-0 text-gray-900;
+  }
+
+  /* Custom Premium Scrollbar */
+  .custom-scrollbar {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* gray-300 */
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8; /* gray-400 */
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-900 placeholder:text-gray-400 hover:bg-gray-50 shadow-sm;
+  }
+  
+  .btn-primary {
+    @apply w-full bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3.5 px-6 rounded-2xl transition-all duration-300 active:scale-[0.98] disabled:opacity-70 shadow-premium hover:shadow-premium-hover;
+  }
+  
+  .btn-secondary {
+    @apply w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3.5 px-6 rounded-2xl border border-gray-200 transition-all duration-300 active:scale-[0.98] shadow-sm flex items-center justify-center gap-3;
+  }
+  
+  .card-premium {
+    @apply bg-white rounded-3xl border border-gray-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03),0_10px_20px_-2px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  }
+}
