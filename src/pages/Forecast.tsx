@@ -10,7 +10,7 @@ import {
   Zap,
   Info
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const priceDataMap: Record<string, any[]> = {
   "Bug'doy": [
@@ -136,7 +136,7 @@ const Forecast: React.FC = () => {
                     dataKey="name" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fontSize: 12, fontWeights: 900, fill: '#94a3b8' }} 
+                    tick={{ fontSize: 12, fontWeight: 900, fill: '#94a3b8' }} 
                     dy={12}
                   />
                   <YAxis 
