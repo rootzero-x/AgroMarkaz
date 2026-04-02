@@ -3,7 +3,7 @@ import {
   MapPin, Layers, Sparkles, Droplet, Brain,
   ChevronDown, AlertTriangle, CheckCircle2, TrendingUp,
   Wind, Sprout, Wallet, Activity, Loader2, ArrowLeft, BarChart3, ChevronRight,
-  Wheat, Leaf, FileText
+  Wheat, Leaf, FileText, ShieldAlert, RefreshCw, FlaskConical, Waves
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -31,6 +31,17 @@ interface AICropResult {
   };
   "taxminiy_foyda_so'm_gektar": number;
   eslatmalar: string;
+  // Yangi kengaytirilgan ma'lumotlar
+  oldin_hosil_tahlili?: {
+    oldin_hosil: string;
+    moslik_darajasi: string;
+    tahlil: string;
+  };
+  tavsiya_etilgan_urug_navi?: {
+    nav_nomi: string;
+    moslik_tahlili: string;
+  };
+  suv_xavfi_va_choralar?: string;
 }
 
 const REGIONS = [
@@ -425,39 +436,69 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <hr className="border-gray-100 my-6" />
 
                     {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                       {/* Yield */}
-                      <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
-                        <div className="bg-white p-2 rounded-lg shadow-sm text-amber-500 shrink-0 border border-gray-100">
-                          <TrendingUp className="w-5 h-5" />
+                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-amber-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                              <TrendingUp className="w-5 h-5" />
+                            </div>
+                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Prognoz hosil</p>
+                          </div>
+                          <div>
+                            {(() => {
+                              const parts = crop.prognoz_hosil.split(',');
+                              return (
+                                <>
+                                  <p className="text-[17px] font-black text-gray-900 leading-tight">
+                                    {parts[0]}
+                                  </p>
+                                  {parts[1] && (
+                                    <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
+                                      {parts.slice(1).join(',').trim()}
+                                    </p>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Prognoz hosil</p>
-                          <p className="text-[15px] font-bold text-gray-800">{crop.prognoz_hosil}</p>
-                        </div>
-                      </div>
 
                       {/* Water */}
-                      <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
-                        <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500 shrink-0 border border-gray-100">
-                          <Droplet className="w-5 h-5" />
+                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-blue-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                              <Droplet className="w-5 h-5" />
+                            </div>
+                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Suv talabi</p>
+                          </div>
+                          <div>
+                            <p className="text-[17px] font-black text-gray-900 leading-tight">
+                              {crop.suv_talabi.m3_gektar_yil} <span className="text-xs text-gray-400 font-bold ml-1">m³/yil</span>
+                            </p>
+                            <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
+                              {crop.suv_talabi.tavsif}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Suv talabi</p>
-                          <p className="text-[15px] font-bold text-gray-800">{crop.suv_talabi.m3_gektar_yil} <span className="text-xs text-gray-500 font-medium">m³/yil</span></p>
-                        </div>
-                      </div>
 
                       {/* Cost */}
-                      <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
-                        <div className="bg-white p-2 rounded-lg shadow-sm text-rose-500 shrink-0 border border-gray-100">
-                          <Wallet className="w-5 h-5" />
+                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-emerald-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                              <Wallet className="w-5 h-5" />
+                            </div>
+                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Umumiy xarajat</p>
+                          </div>
+                          <div>
+                            <p className="text-[17px] font-black text-gray-900 leading-tight">
+                              {formatMoney(crop.xarajat["umumiy_so'm_1_gektar"])}
+                            </p>
+                            <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
+                              Gektariga sarflanadigan jami mablag'
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Umumiy xarajat</p>
-                          <p className="text-[15px] font-bold text-gray-800">{formatMoney(crop.xarajat["umumiy_so'm_1_gektar"])}</p>
-                        </div>
-                      </div>
                     </div>
 
                     {/* Hosildorlik Tahlili & Diagramma */}
@@ -485,40 +526,146 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       </div>
                     )}
 
-                    {/* Detailed Accordions / Info sections */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
+                    {/* New Premium Cost & Labor Blocks */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
 
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="flex items-center gap-2 text-[13px] font-bold text-gray-800 mb-1.5 uppercase tracking-wide">
-                            <Wallet className="w-4 h-4 text-gray-400" /> Xarajatlar taqsimoti
-                          </h4>
-                          <p className="text-[14px] text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100 h-full">{crop.xarajat.tavsif}</p>
+                      {/* Cost Breakdown Analysis */}
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50/30 overflow-hidden relative group/block">
+                        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200 bg-slate-100/50">
+                          <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-200 text-slate-600">
+                            <Wallet className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-widest leading-none">Xarajatlar taqsimoti</h4>
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <p className="text-[14px] text-slate-700 leading-relaxed font-medium">
+                            {crop.xarajat.tavsif}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="flex items-center gap-2 text-[13px] font-bold text-gray-800 mb-1.5 uppercase tracking-wide">
-                            <Activity className="w-4 h-4 text-gray-400" /> Mehnat sarfi
-                          </h4>
-                          <p className="text-[14px] text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <span className="font-semibold text-gray-800 mr-2">{crop.mehnat_xarajati.ish_kunlari_1_gektar} ish kuni.</span>
+                      {/* Labor Analysis */}
+                      <div className="rounded-3xl border border-amber-100 bg-amber-50/30 overflow-hidden relative group/block">
+                        <div className="flex items-center gap-3 px-5 py-3.5 border-b border-amber-100 bg-amber-50/50">
+                          <div className="bg-white p-2 rounded-xl shadow-sm border border-amber-100 text-amber-600">
+                            <Activity className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-[12px] font-bold text-amber-900 uppercase tracking-widest leading-none">Mehnat sarfi</h4>
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <div className="inline-flex items-center gap-2 bg-amber-100/50 border border-amber-200 rounded-lg px-2.5 py-1 mb-3">
+                            <span className="text-[13px] font-bold text-amber-800">{crop.mehnat_xarajati.ish_kunlari_1_gektar} ish kuni (ga)</span>
+                          </div>
+                          <p className="text-[14px] text-amber-950 leading-relaxed font-medium">
                             {crop.mehnat_xarajati.tavsif}
                           </p>
                         </div>
                       </div>
+
+                    </div>
+
+                    {/* ── NEW PREMIUM BLOCKS ── */}
+                    <div className="grid grid-cols-1 gap-5 mt-8">
+                      
+                      {/* Crop Rotation Analysis */}
+                      {crop.oldin_hosil_tahlili && (
+                        <div className="rounded-3xl border border-emerald-100 bg-emerald-50/30 overflow-hidden relative group/block">
+                          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-emerald-100 bg-emerald-50/50">
+                            <div className="bg-white p-2 rounded-xl shadow-sm border border-emerald-100 text-emerald-600">
+                              <RefreshCw className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-[12px] font-bold text-emerald-900 uppercase tracking-widest">Ekin Almashinuv Tahlili</h4>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200">
+                                {crop.oldin_hosil_tahlili.oldin_hosil} dan keyin
+                              </span>
+                              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-tighter
+                                ${crop.oldin_hosil_tahlili.moslik_darajasi.toLowerCase() === 'yuqori' 
+                                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
+                                  : 'bg-amber-500 text-white'}`}>
+                                {crop.oldin_hosil_tahlili.moslik_darajasi} moslik
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-5">
+                            <p className="text-[14px] text-emerald-950 leading-relaxed font-medium">
+                              {crop.oldin_hosil_tahlili.tahlil}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tavsiya etilgan urug' navi */}
+                      {crop.tavsiya_etilgan_urug_navi && (
+                        <div className="rounded-3xl border border-primary-100 bg-primary-50/20 overflow-hidden relative group/block">
+                          <div className="flex items-center gap-3 px-5 py-4 border-b border-primary-100 bg-primary-50/40">
+                            <div className="bg-primary-600 p-2 rounded-xl shadow-md shadow-primary-600/20 text-white">
+                              <FlaskConical className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-[13px] font-bold text-primary-900 uppercase tracking-widest leading-none">Tavsiya etilgan urug' navi</h4>
+                            </div>
+                          </div>
+                          <div className="p-5 space-y-4">
+                            <div className="bg-white border border-primary-100 p-4 rounded-2xl shadow-sm">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.1em]">Nav nomi</span>
+                                <Leaf className="w-3 h-3 text-primary-500" />
+                              </div>
+                              <p className="text-xl font-bold text-primary-700 leading-tight">{crop.tavsiya_etilgan_urug_navi.nav_nomi}</p>
+                            </div>
+                            <div className="bg-white/50 p-4 rounded-2xl border border-primary-50/50">
+                              <p className="text-[14px] text-gray-700 leading-relaxed font-medium">
+                                {crop.tavsiya_etilgan_urug_navi.moslik_tahlili}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Water Risk Mitigation */}
+                      {crop.suv_xavfi_va_choralar && (
+                        <div className="rounded-3xl border border-blue-100 bg-blue-50/30 overflow-hidden relative group/block">
+                          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-blue-100 bg-blue-50/50">
+                            <div className="bg-white p-2 rounded-xl shadow-sm border border-blue-100 text-blue-600">
+                              <Waves className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-[12px] font-bold text-blue-900 uppercase tracking-widest">Suv xavfi va choralar</h4>
+                            </div>
+                            <div className="bg-blue-600 text-white p-1 rounded-full animate-pulse shadow-lg shadow-blue-500/30">
+                              <ShieldAlert className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                          <div className="p-5">
+                            <p className="text-[14px] text-blue-950 leading-relaxed font-medium">
+                              {crop.suv_xavfi_va_choralar}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
 
                     {/* Notes (Eslatmalar) */}
-                    <div className="mt-6 bg-primary-50 rounded-2xl p-4 border border-primary-100 flex items-start gap-3">
-                      <Wind className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="text-[13px] font-bold text-primary-900 mb-1 uppercase tracking-wide">Muhim eslatmalar</h4>
-                        <p className="text-[14px] text-primary-800 leading-relaxed">{crop.eslatmalar}</p>
+                    <div className="mt-8 bg-white rounded-3xl p-6 border-l-4 border-primary-600 shadow-sm shadow-primary-600/5 relative overflow-hidden group/notes">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 rounded-bl-full -z-10 opacity-50 group-hover/notes:scale-110 transition-transform"></div>
+                      <div className="flex items-start gap-4">
+                        <div className="bg-primary-50 p-2.5 rounded-2xl text-primary-600 shrink-0 shadow-sm border border-primary-100">
+                          <Wind className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-[13px] font-black text-primary-900 mb-1.5 uppercase tracking-[0.15em] pt-1 leading-none">Muhim eslatmalar</h4>
+                          <p className="text-[15px] text-gray-700 leading-relaxed font-medium">{crop.eslatmalar}</p>
+                        </div>
                       </div>
                     </div>
-
                   </motion.div>
                 ))}
               </motion.div>
