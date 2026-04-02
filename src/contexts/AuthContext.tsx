@@ -7,6 +7,7 @@ interface User {
   username: string;
   email: string;
   phone_number: string;
+  plan?: string;
 }
 
 interface AuthContextType {
@@ -87,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.get('/auth/me');
 
       // Assume response.data contains the user object or response.data.user
-      const userData = res.data.user || res.data;
+      const userData = { ...(res.data.user || res.data), plan: 'Freemium' };
       setUser(userData);
     } catch (err) {
       console.warn('Session check failed or expired', err);

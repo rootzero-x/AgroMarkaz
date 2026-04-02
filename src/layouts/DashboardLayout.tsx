@@ -11,6 +11,12 @@ import { motion } from 'framer-motion';
 const DashboardLayout: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const [chatOpen, setChatOpen] = useState(false);
+  
+  React.useEffect(() => {
+    const handleOpenChat = () => setChatOpen(true);
+    window.addEventListener('open-chat', handleOpenChat);
+    return () => window.removeEventListener('open-chat', handleOpenChat);
+  }, []);
 
   if (loading) {
     return <LoadingOverlay />;
@@ -39,7 +45,7 @@ const DashboardLayout: React.FC = () => {
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
-        onClick={() => setChatOpen(true)}
+        onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
         className="md:hidden fixed bottom-20 right-4 z-[60] w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #15803d, #16a34a)' }}
         aria-label="Chat yordam"

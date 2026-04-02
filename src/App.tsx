@@ -11,6 +11,7 @@ import Forecast from './pages/Forecast';
 import Recommendation from './pages/Recommendation';
 import Weather from './pages/Weather';
 import Profile from './pages/Profile';
+import Billing from './pages/Billing';
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,7 @@ const App: React.FC = () => {
             <Route path="/recommendation" element={<Recommendation />} />
             <Route path="/weather" element={<Weather />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/billing" element={<Billing />} />
           </Route>
 
           {/* Catch all */}
