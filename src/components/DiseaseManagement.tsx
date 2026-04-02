@@ -5,7 +5,7 @@ import {
   ChevronRight, ArrowLeft, Search, AlertCircle, 
   CheckCircle2, Info, Microscope, Droplets, Zap,
   FlaskConical, MapPin, Calendar, ClipboardCheck,
-  Truck, Beaker, Thermometer, Wind, MousePointer2
+  Truck, Beaker, Thermometer, Wind
 } from 'lucide-react';
 
 interface Disease {

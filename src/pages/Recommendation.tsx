@@ -4,8 +4,7 @@ import {
   ChevronDown, AlertTriangle, CheckCircle2, TrendingUp,
   Wind, Sprout, Wallet, Activity, Loader2, ArrowLeft, BarChart3, ChevronRight,
   Wheat, Leaf, FileText, ShieldAlert, RefreshCw, FlaskConical, Waves,
-  ShoppingCart, AlertCircle, Package, Bug, Camera, History,
-  Newspaper, Truck, Users, ShoppingBag, Bell, Banknote
+  ShoppingCart, Newspaper, Truck, Users, ShoppingBag, Bell, Banknote
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
