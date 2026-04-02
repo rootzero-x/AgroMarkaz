@@ -70,7 +70,38 @@ const Weather: React.FC = () => {
 
   const HOURLY_VISIBLE = 6;
 
-  const fetchWeather = useCallback(async (lat: number, lon: number) => {
+  const WEATHER_CACHE_KEY = 'weather_cache_v1';
+
+  // LocalStorage dan cache o'qib olamiz (sahifaga qaytganda ishlatiladi)
+  const loadFromCache = (): { weather: WeatherData; locationName: string; lat: number; lon: number } | null => {
+    try {
+      const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+
+  // Cache ga yozamiz
+  const saveToCache = (w: WeatherData, name: string, lat: number, lon: number) => {
+    try {
+      localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ weather: w, locationName: name, lat, lon }));
+    } catch { }
+  };
+
+  const fetchWeather = useCallback(async (lat: number, lon: number, forceRefresh = false) => {
+    // Cache ni tekshiramiz — agar bor bo'lsa va force emas bo'lsa, ishlatamiz
+    if (!forceRefresh) {
+      const cached = loadFromCache();
+      // Bir xil koordinatalarga kesh bo'lsa, qayta request yubormaymiz
+      if (cached && cached.lat === lat && cached.lon === lon) {
+        setWeather(cached.weather);
+        setLocationName(cached.locationName);
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
     try {
@@ -78,7 +109,7 @@ const Weather: React.FC = () => {
       const weatherData = res.data.weather ?? res.data;
       setWeather(weatherData);
 
-      // Reverse geocoding (Nominatim) for actual city name
+      // Reverse geocoding
       fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=uz&email=info@agromarkaz.uz`
       )
@@ -90,9 +121,16 @@ const Weather: React.FC = () => {
             a.state || a.region || '',
             a.country || '',
           ].filter(Boolean);
-          setLocationName(cityRegion.join(', ') || data.display_name || weatherData.timezone);
+          const name = cityRegion.join(', ') || data.display_name || weatherData.timezone;
+          setLocationName(name);
+          // Cache ga saqlaymiz
+          saveToCache(weatherData, name, lat, lon);
         })
-        .catch(() => setLocationName(weatherData.timezone));
+        .catch(() => {
+          const fallbackName = weatherData.timezone;
+          setLocationName(fallbackName);
+          saveToCache(weatherData, fallbackName, lat, lon);
+        });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ob-havo ma\'lumotlarini yuklab bo\'lmadi.');
     } finally {
@@ -102,9 +140,15 @@ const Weather: React.FC = () => {
 
   useEffect(() => {
     if (userLocation) {
-      fetchWeather(userLocation.lat, userLocation.lon);
+      // forceRefresh = false => cache dan o'qiydi, request yubormasin
+      fetchWeather(userLocation.lat, userLocation.lon, false);
     }
   }, [userLocation, fetchWeather]);
+
+  // Manual Refresh: shart 2 — faqat user o'zi bosganda force=true bilan yangilash
+  const handleRefresh = () => {
+    if (userLocation) fetchWeather(userLocation.lat, userLocation.lon, true);
+  };
 
   const handleLocationGranted = (lat: number, lon: number) => {
     setUserLocation({ lat, lon });
@@ -166,7 +210,7 @@ const Weather: React.FC = () => {
         <h2 className="text-lg font-bold text-gray-800 mb-2">Xatolik yuz berdi</h2>
         <p className="text-sm text-gray-500 mb-5">{error}</p>
         <button
-          onClick={() => userLocation && fetchWeather(userLocation.lat, userLocation.lon)}
+      onClick={() => userLocation && fetchWeather(userLocation.lat, userLocation.lon, true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
         >
           <RefreshCw className="w-4 h-4" /> Qayta urinib ko'ring
@@ -203,8 +247,8 @@ const Weather: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={() => userLocation && fetchWeather(userLocation.lat, userLocation.lon)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-500 text-xs font-semibold border border-gray-100 transition-all"
+          onClick={handleRefresh}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-500 text-xs font-semibold border border-gray-100 transition-all active:scale-95"
         >
           <RefreshCw className="w-3.5 h-3.5" /> Yangilash
         </button>

@@ -50,12 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('auth_token_v1');
     localStorage.removeItem('auth_token_time_v1');
+    // Weather cache ni ham tozalaymiz
+    localStorage.removeItem('weather_cache_v1');
     setUser(null);
   };
 
   const login = (token: string, userData?: User) => {
     localStorage.setItem('auth_token_v1', token);
     localStorage.setItem('auth_token_time_v1', Date.now().toString());
+    // Yangi login bo'lganda weather cache ni tozalab tashlash (shart 1)
+    localStorage.removeItem('weather_cache_v1');
     if (userData) {
       setUser(userData);
     } else {
