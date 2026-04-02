@@ -3,10 +3,14 @@ import {
   MapPin, Layers, Sparkles, Droplet, Brain,
   ChevronDown, AlertTriangle, CheckCircle2, TrendingUp,
   Wind, Sprout, Wallet, Activity, Loader2, ArrowLeft, BarChart3, ChevronRight,
-  Wheat, Leaf, FileText, ShieldAlert, RefreshCw, FlaskConical, Waves
+  Wheat, Leaf, FileText, ShieldAlert, RefreshCw, FlaskConical, Waves,
+  ShoppingCart, AlertCircle, Package, Bug, Camera, History,
+  Newspaper, Truck, Users, ShoppingBag, Bell, Banknote
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
+import MarketAnalysisModule from '../components/MarketAnalysis';
+import DiseaseManagementModule from '../components/DiseaseManagement';
 
 interface AICropResult {
   ekin_nomi: string;
@@ -31,7 +35,6 @@ interface AICropResult {
   };
   "taxminiy_foyda_so'm_gektar": number;
   eslatmalar: string;
-  // Yangi kengaytirilgan ma'lumotlar
   oldin_hosil_tahlili?: {
     oldin_hosil: string;
     moslik_darajasi: string;
@@ -61,7 +64,6 @@ const formatMoney = (amount: number) => {
 const renderYieldChart = (forecastStr: string, avgVal: number) => {
   let min = avgVal * 0.8;
   let max = avgVal * 1.2;
-  // Try parsing something like "45-60 tonna/gektar"
   const nums = forecastStr.match(/\d+(\.\d+)?/g);
   if (nums && nums.length >= 2) {
     min = parseFloat(nums[0]);
@@ -74,7 +76,7 @@ const renderYieldChart = (forecastStr: string, avgVal: number) => {
   if (isNaN(min)) min = 0;
   if (isNaN(max)) max = avgVal * 1.2;
 
-  const maxScale = Math.max(max * 1.15, avgVal * 1.15); // Add breathing room
+  const maxScale = Math.max(max * 1.15, avgVal * 1.15);
 
   const bars = [
     { label: "Minimal (Xavf darajasi)", val: min, color: "bg-slate-400" },
@@ -114,7 +116,6 @@ const renderYieldChart = (forecastStr: string, avgVal: number) => {
     </div>
   );
 };
-
 
 const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [hudud, setHudud] = useState('');
@@ -175,7 +176,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <ArrowLeft className="w-4 h-4" /> Ortga qaytish
       </button>
 
-      {/* Module Header - FIXED / STICKY qilingan (2-rasm dagi balandlikka ko'tarilib, yuqoriga ketmaydi) */}
       <div className="sticky top-0 z-50 bg-primary-600 rounded-3xl p-6 md:p-8 relative overflow-hidden ring-0 border-0 shadow-lg shadow-primary-600/30">
         <h1 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2 z-10 relative flex items-center gap-3">
           <Brain className="w-8 h-8 text-primary-200" /> AI Agronom
@@ -187,15 +187,10 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-        {/* Form Panel (Left) - 2-rasm dagi balandlikka ko'tarilib, sticky qilib to'xtatildi */}
         <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-[220px] w-full">
           <div className="card-premium p-6 md:p-7">
             <h2 className="text-[19px] font-bold text-gray-900 mb-6 font-display">Ma'lumotlarni kiriting</h2>
-
             <div className="space-y-5">
-
-              {/* Hudud */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <MapPin className="w-4 h-4 text-primary-600" /> Hudud
@@ -212,8 +207,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
               </div>
-
-              {/* Yer Hajmi */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <Layers className="w-4 h-4 text-primary-600" /> Yer hajmi (gektar)
@@ -226,8 +219,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[15px]"
                 />
               </div>
-
-              {/* Tuproq turi */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <Sparkles className="w-4 h-4 text-primary-600" /> Tuproq turi
@@ -237,18 +228,13 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <button
                       key={type}
                       onClick={() => setTuproqTuri(type)}
-                      className={`py-3 rounded-[12px] text-sm font-semibold transition-all duration-200
-                        ${tuproqTuri === type
-                          ? 'bg-primary-50 text-primary-700 border border-primary-600 shadow-sm'
-                          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'}`}
+                      className={`py-3 rounded-[12px] text-sm font-semibold transition-all duration-200 ${tuproqTuri === type ? 'bg-primary-50 text-primary-700 border border-primary-600 shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'}`}
                     >
                       {type}
                     </button>
                   ))}
                 </div>
               </div>
-
-              {/* Suv mavjudligi */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <Droplet className="w-4 h-4 text-primary-600" /> Suv mavjudligi
@@ -258,18 +244,13 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <button
                       key={level}
                       onClick={() => setSuvMavjudligi(level)}
-                      className={`py-3 rounded-[12px] text-[13px] font-semibold transition-all duration-200
-                        ${suvMavjudligi === level
-                          ? 'bg-primary-50 text-primary-700 border border-primary-600 shadow-sm'
-                          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'}`}
+                      className={`py-3 rounded-[12px] text-[13px] font-semibold transition-all duration-200 ${suvMavjudligi === level ? 'bg-primary-50 text-primary-700 border border-primary-600 shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'}`}
                     >
                       {level}
                     </button>
                   ))}
                 </div>
               </div>
-
-              {/* Oldingi Hosil */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <Wheat className="w-4 h-4 text-primary-600" /> Oldingi hosil
@@ -283,8 +264,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] placeholder:text-gray-300"
                 />
               </div>
-
-              {/* Urug' Navi */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <Leaf className="w-4 h-4 text-primary-600" /> Urug' navi
@@ -298,8 +277,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] placeholder:text-gray-300"
                 />
               </div>
-
-              {/* Qo'shimcha ma'lumotlar */}
               <div>
                 <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
                   <FileText className="w-4 h-4 text-primary-600" /> Qo'shimcha ma'lumotlar
@@ -313,39 +290,26 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] resize-none placeholder:text-gray-300 leading-relaxed"
                 />
               </div>
-
               {error && (
                 <div className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-start gap-2 text-red-600 text-[13px] font-medium animate-in fade-in zoom-in-95">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                   <p>{error}</p>
                 </div>
               )}
-
               <button
                 onClick={handleAnalyze}
                 disabled={!isFormValid || loading}
-                className={`w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.98] ${isFormValid && !loading
-                  ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/30'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                className={`w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.98] ${isFormValid && !loading ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/30' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
               >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Brain className="w-5 h-5" />
-                )}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
                 <span>{loading ? "Tahlil qilinmoqda..." : "AI tahlil qilish"}</span>
               </button>
-
             </div>
           </div>
         </div>
 
-        {/* Results Panel (Right) - faqat shu qism scroll bo'ladi, yuqoriga (header + form ostiga) kirib ketadi */}
         <div className="lg:col-span-8 w-full max-w-full overflow-hidden">
           <AnimatePresence mode="wait">
-
-            {/* Initial State */}
             {!loading && !results && (
               <motion.div
                 key="empty"
@@ -363,8 +327,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </p>
               </motion.div>
             )}
-
-            {/* Loading State */}
             {loading && (
               <motion.div
                 key="loading"
@@ -384,8 +346,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </div>
               </motion.div>
             )}
-
-            {/* Results State */}
             {!loading && results && (
               <motion.div
                 key="results"
@@ -402,7 +362,6 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <CheckCircle2 className="w-4 h-4" /> Muvaffaqiyatli
                   </div>
                 </div>
-
                 {results.map((crop, idx) => (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -412,18 +371,11 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     className="card-premium p-6 md:p-8 relative overflow-hidden group hover:shadow-md transition-shadow"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50/50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
-
-                    {/* Crop Header */}
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2 flex-wrap">
                           <h3 className="text-2xl font-bold text-gray-900 font-display capitalize">{crop.ekin_nomi}</h3>
-                          <span className={`px-2.5 py-1 rounded-[10px] text-[11px] font-bold uppercase tracking-wide
-                            ${crop.moslik_darajasi === 'yuqori' ? 'bg-green-100 text-green-700 border border-green-200' :
-                              crop.moslik_darajasi === "o'rtacha" ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                                'bg-red-100 text-red-700 border border-red-200'}`}>
-                            {crop.moslik_darajasi} moslik
-                          </span>
+                          <span className={`px-2.5 py-1 rounded-[10px] text-[11px] font-bold uppercase tracking-wide ${crop.moslik_darajasi === 'yuqori' ? 'bg-green-100 text-green-700 border border-green-200' : crop.moslik_darajasi === "o'rtacha" ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>{crop.moslik_darajasi} moslik</span>
                         </div>
                         <p className="text-[15px] text-gray-600 leading-relaxed max-w-2xl">{crop.tavsif}</p>
                       </div>
@@ -432,76 +384,52 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         <p className="text-2xl font-bold text-primary-600 font-mono tracking-tight">{formatMoney(crop["taxminiy_foyda_so'm_gektar"])}<span className="text-sm text-gray-400 font-sans ml-1">/ ga</span></p>
                       </div>
                     </div>
-
                     <hr className="border-gray-100 my-6" />
-
-                    {/* Quick Stats Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                      {/* Yield */}
-                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-amber-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
-                              <TrendingUp className="w-5 h-5" />
-                            </div>
-                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Prognoz hosil</p>
+                      <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-white p-2.5 rounded-2xl shadow-sm text-amber-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                            <TrendingUp className="w-5 h-5" />
                           </div>
-                          <div>
-                            {(() => {
-                              const parts = crop.prognoz_hosil.split(',');
-                              return (
-                                <>
-                                  <p className="text-[17px] font-black text-gray-900 leading-tight">
-                                    {parts[0]}
-                                  </p>
-                                  {parts[1] && (
-                                    <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
-                                      {parts.slice(1).join(',').trim()}
-                                    </p>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </div>
+                          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Prognoz hosil</p>
                         </div>
-
-                      {/* Water */}
-                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-blue-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
-                              <Droplet className="w-5 h-5" />
-                            </div>
-                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Suv talabi</p>
-                          </div>
-                          <div>
-                            <p className="text-[17px] font-black text-gray-900 leading-tight">
-                              {crop.suv_talabi.m3_gektar_yil} <span className="text-xs text-gray-400 font-bold ml-1">m³/yil</span>
-                            </p>
-                            <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
-                              {crop.suv_talabi.tavsif}
-                            </p>
-                          </div>
+                        <div>
+                          {(() => {
+                            const parts = crop.prognoz_hosil.split(',');
+                            return (
+                              <>
+                                <p className="text-[17px] font-black text-gray-900 leading-tight">{parts[0]}</p>
+                                {parts[1] && <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">{parts.slice(1).join(',').trim()}</p>}
+                              </>
+                            );
+                          })()}
                         </div>
-
-                      {/* Cost */}
-                        <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-white p-2.5 rounded-2xl shadow-sm text-emerald-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
-                              <Wallet className="w-5 h-5" />
-                            </div>
-                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Umumiy xarajat</p>
+                      </div>
+                      <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-white p-2.5 rounded-2xl shadow-sm text-blue-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                            <Droplet className="w-5 h-5" />
                           </div>
-                          <div>
-                            <p className="text-[17px] font-black text-gray-900 leading-tight">
-                              {formatMoney(crop.xarajat["umumiy_so'm_1_gektar"])}
-                            </p>
-                            <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">
-                              Gektariga sarflanadigan jami mablag'
-                            </p>
-                          </div>
+                          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Suv talabi</p>
                         </div>
+                        <div>
+                          <p className="text-[17px] font-black text-gray-900 leading-tight">{crop.suv_talabi.m3_gektar_yil} <span className="text-xs text-gray-400 font-bold ml-1">m³/yil</span></p>
+                          <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">{crop.suv_talabi.tavsif}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col p-5 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 group/stat">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-white p-2.5 rounded-2xl shadow-sm text-emerald-500 border border-gray-100 group-hover/stat:scale-110 transition-transform">
+                            <Wallet className="w-5 h-5" />
+                          </div>
+                          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">Umumiy xarajat</p>
+                        </div>
+                        <div>
+                          <p className="text-[17px] font-black text-gray-900 leading-tight">{formatMoney(crop.xarajat["umumiy_so'm_1_gektar"])}</p>
+                          <p className="text-[11px] text-gray-400 mt-2 leading-relaxed font-medium">Gektariga sarflanadigan jami mablag'</p>
+                        </div>
+                      </div>
                     </div>
-
-                    {/* Hosildorlik Tahlili & Diagramma */}
                     {crop.hosildorlik_tahlili && (
                       <div className="mb-6 bg-slate-50/50 rounded-2xl p-4 sm:p-5 border border-slate-200">
                         <div className="flex flex-col sm:flex-row gap-4 w-full">
@@ -511,106 +439,52 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                           <div className="flex-1 w-full min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <h4 className="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Hosildorlik Tahlili</h4>
-                              <span className="bg-white text-slate-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200">
-                                O'rtacha {crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar} t/ga
-                              </span>
+                              <span className="bg-white text-slate-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200">O'rtacha {crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar} t/ga</span>
                             </div>
-                            <p className="text-[14px] text-slate-600 leading-relaxed font-medium">
-                              {crop.hosildorlik_tahlili.tahlil}
-                            </p>
-
-                            {/* Animated Responsive Chart */}
+                            <p className="text-[14px] text-slate-600 leading-relaxed font-medium">{crop.hosildorlik_tahlili.tahlil}</p>
                             {renderYieldChart(crop.prognoz_hosil, crop.hosildorlik_tahlili.ortacha_hosil_tonna_gektar)}
                           </div>
                         </div>
                       </div>
                     )}
-
-                    {/* New Premium Cost & Labor Blocks */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-
-                      {/* Cost Breakdown Analysis */}
                       <div className="rounded-3xl border border-slate-200 bg-slate-50/30 overflow-hidden relative group/block">
                         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200 bg-slate-100/50">
-                          <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-200 text-slate-600">
-                            <Wallet className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-widest leading-none">Xarajatlar taqsimoti</h4>
-                          </div>
+                          <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-200 text-slate-600"><Wallet className="w-4 h-4" /></div>
+                          <div className="flex-1"><h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-widest leading-none">Xarajatlar taqsimoti</h4></div>
                         </div>
-                        <div className="p-5">
-                          <p className="text-[14px] text-slate-700 leading-relaxed font-medium">
-                            {crop.xarajat.tavsif}
-                          </p>
-                        </div>
+                        <div className="p-5"><p className="text-[14px] text-slate-700 leading-relaxed font-medium">{crop.xarajat.tavsif}</p></div>
                       </div>
-
-                      {/* Labor Analysis */}
                       <div className="rounded-3xl border border-amber-100 bg-amber-50/30 overflow-hidden relative group/block">
                         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-amber-100 bg-amber-50/50">
-                          <div className="bg-white p-2 rounded-xl shadow-sm border border-amber-100 text-amber-600">
-                            <Activity className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-[12px] font-bold text-amber-900 uppercase tracking-widest leading-none">Mehnat sarfi</h4>
-                          </div>
+                          <div className="bg-white p-2 rounded-xl shadow-sm border border-amber-100 text-amber-600"><Activity className="w-4 h-4" /></div>
+                          <div className="flex-1"><h4 className="text-[12px] font-bold text-amber-900 uppercase tracking-widest leading-none">Mehnat sarfi</h4></div>
                         </div>
                         <div className="p-5">
-                          <div className="inline-flex items-center gap-2 bg-amber-100/50 border border-amber-200 rounded-lg px-2.5 py-1 mb-3">
-                            <span className="text-[13px] font-bold text-amber-800">{crop.mehnat_xarajati.ish_kunlari_1_gektar} ish kuni (ga)</span>
-                          </div>
-                          <p className="text-[14px] text-amber-950 leading-relaxed font-medium">
-                            {crop.mehnat_xarajati.tavsif}
-                          </p>
+                          <div className="inline-flex items-center gap-2 bg-amber-100/50 border border-amber-200 rounded-lg px-2.5 py-1 mb-3"><span className="text-[13px] font-bold text-amber-800">{crop.mehnat_xarajati.ish_kunlari_1_gektar} ish kuni (ga)</span></div>
+                          <p className="text-[14px] text-amber-950 leading-relaxed font-medium">{crop.mehnat_xarajati.tavsif}</p>
                         </div>
                       </div>
-
                     </div>
-
-                    {/* ── NEW PREMIUM BLOCKS ── */}
                     <div className="grid grid-cols-1 gap-5 mt-8">
-                      
-                      {/* Crop Rotation Analysis */}
                       {crop.oldin_hosil_tahlili && (
                         <div className="rounded-3xl border border-emerald-100 bg-emerald-50/30 overflow-hidden relative group/block">
                           <div className="flex items-center gap-3 px-5 py-3.5 border-b border-emerald-100 bg-emerald-50/50">
-                            <div className="bg-white p-2 rounded-xl shadow-sm border border-emerald-100 text-emerald-600">
-                              <RefreshCw className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="text-[12px] font-bold text-emerald-900 uppercase tracking-widest">Ekin Almashinuv Tahlili</h4>
-                            </div>
+                            <div className="bg-white p-2 rounded-xl shadow-sm border border-emerald-100 text-emerald-600"><RefreshCw className="w-4 h-4" /></div>
+                            <div className="flex-1"><h4 className="text-[12px] font-bold text-emerald-900 uppercase tracking-widest">Ekin Almashinuv Tahlili</h4></div>
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200">
-                                {crop.oldin_hosil_tahlili.oldin_hosil} dan keyin
-                              </span>
-                              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-tighter
-                                ${crop.oldin_hosil_tahlili.moslik_darajasi.toLowerCase() === 'yuqori' 
-                                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-                                  : 'bg-amber-500 text-white'}`}>
-                                {crop.oldin_hosil_tahlili.moslik_darajasi} moslik
-                              </span>
+                              <span className="text-[11px] font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200">{crop.oldin_hosil_tahlili.oldin_hosil} dan keyin</span>
+                              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-tighter ${crop.oldin_hosil_tahlili.moslik_darajasi.toLowerCase() === 'yuqori' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 text-white'}`}>{crop.oldin_hosil_tahlili.moslik_darajasi} moslik</span>
                             </div>
                           </div>
-                          <div className="p-5">
-                            <p className="text-[14px] text-emerald-950 leading-relaxed font-medium">
-                              {crop.oldin_hosil_tahlili.tahlil}
-                            </p>
-                          </div>
+                          <div className="p-5"><p className="text-[14px] text-emerald-950 leading-relaxed font-medium">{crop.oldin_hosil_tahlili.tahlil}</p></div>
                         </div>
                       )}
-
-                      {/* Tavsiya etilgan urug' navi */}
                       {crop.tavsiya_etilgan_urug_navi && (
                         <div className="rounded-3xl border border-primary-100 bg-primary-50/20 overflow-hidden relative group/block">
                           <div className="flex items-center gap-3 px-5 py-4 border-b border-primary-100 bg-primary-50/40">
-                            <div className="bg-primary-600 p-2 rounded-xl shadow-md shadow-primary-600/20 text-white">
-                              <FlaskConical className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="text-[13px] font-bold text-primary-900 uppercase tracking-widest leading-none">Tavsiya etilgan urug' navi</h4>
-                            </div>
+                            <div className="bg-primary-600 p-2 rounded-xl shadow-md shadow-primary-600/20 text-white"><FlaskConical className="w-4 h-4" /></div>
+                            <div className="flex-1"><h4 className="text-[13px] font-bold text-primary-900 uppercase tracking-widest leading-none">Tavsiya etilgan urug' navi</h4></div>
                           </div>
                           <div className="p-5 space-y-4">
                             <div className="bg-white border border-primary-100 p-4 rounded-2xl shadow-sm">
@@ -620,46 +494,25 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                               </div>
                               <p className="text-xl font-bold text-primary-700 leading-tight">{crop.tavsiya_etilgan_urug_navi.nav_nomi}</p>
                             </div>
-                            <div className="bg-white/50 p-4 rounded-2xl border border-primary-50/50">
-                              <p className="text-[14px] text-gray-700 leading-relaxed font-medium">
-                                {crop.tavsiya_etilgan_urug_navi.moslik_tahlili}
-                              </p>
-                            </div>
+                            <div className="bg-white/50 p-4 rounded-2xl border border-primary-50/50"><p className="text-[14px] text-gray-700 leading-relaxed font-medium">{crop.tavsiya_etilgan_urug_navi.moslik_tahlili}</p></div>
                           </div>
                         </div>
                       )}
-
-                      {/* Water Risk Mitigation */}
                       {crop.suv_xavfi_va_choralar && (
                         <div className="rounded-3xl border border-blue-100 bg-blue-50/30 overflow-hidden relative group/block">
                           <div className="flex items-center gap-3 px-5 py-3.5 border-b border-blue-100 bg-blue-50/50">
-                            <div className="bg-white p-2 rounded-xl shadow-sm border border-blue-100 text-blue-600">
-                              <Waves className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="text-[12px] font-bold text-blue-900 uppercase tracking-widest">Suv xavfi va choralar</h4>
-                            </div>
-                            <div className="bg-blue-600 text-white p-1 rounded-full animate-pulse shadow-lg shadow-blue-500/30">
-                              <ShieldAlert className="w-3.5 h-3.5" />
-                            </div>
+                            <div className="bg-white p-2 rounded-xl shadow-sm border border-blue-100 text-blue-600"><Waves className="w-4 h-4" /></div>
+                            <div className="flex-1"><h4 className="text-[12px] font-bold text-blue-900 uppercase tracking-widest">Suv xavfi va choralar</h4></div>
+                            <div className="bg-blue-600 text-white p-1 rounded-full animate-pulse shadow-lg shadow-blue-500/30"><ShieldAlert className="w-3.5 h-3.5" /></div>
                           </div>
-                          <div className="p-5">
-                            <p className="text-[14px] text-blue-950 leading-relaxed font-medium">
-                              {crop.suv_xavfi_va_choralar}
-                            </p>
-                          </div>
+                          <div className="p-5"><p className="text-[14px] text-blue-950 leading-relaxed font-medium">{crop.suv_xavfi_va_choralar}</p></div>
                         </div>
                       )}
-
                     </div>
-
-                    {/* Notes (Eslatmalar) */}
                     <div className="mt-8 bg-white rounded-3xl p-6 border-l-4 border-primary-600 shadow-sm shadow-primary-600/5 relative overflow-hidden group/notes">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 rounded-bl-full -z-10 opacity-50 group-hover/notes:scale-110 transition-transform"></div>
                       <div className="flex items-start gap-4">
-                        <div className="bg-primary-50 p-2.5 rounded-2xl text-primary-600 shrink-0 shadow-sm border border-primary-100">
-                          <Wind className="w-5 h-5" />
-                        </div>
+                        <div className="bg-primary-50 p-2.5 rounded-2xl text-primary-600 shrink-0 shadow-sm border border-primary-100"><Wind className="w-5 h-5" /></div>
                         <div className="flex-1">
                           <h4 className="text-[13px] font-black text-primary-900 mb-1.5 uppercase tracking-[0.15em] pt-1 leading-none">Muhim eslatmalar</h4>
                           <p className="text-[15px] text-gray-700 leading-relaxed font-medium">{crop.eslatmalar}</p>
@@ -681,75 +534,218 @@ const Recommendation: React.FC = () => {
   const [activeModule, setActiveModule] = useState<string | null>(null);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-      {!activeModule && (
-        <AnimatePresence mode="wait">
+    <div className="pt-2 md:pt-4 lg:pt-6 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      <AnimatePresence mode="wait">
+        {!activeModule ? (
           <motion.div
+            key="selection"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="space-y-8"
+            className="space-y-6"
           >
-            {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Tavsiyalar markazi</h1>
-                <p className="text-gray-500 max-w-xl">
+            <div className="bg-[#5C8D46] rounded-[2rem] px-8 py-5 md:px-10 md:py-6 text-white shadow-2xl shadow-emerald-900/20 mb-6 relative overflow-hidden">
+              <div className="relative z-10">
+                <h1 className="text-xl md:text-3xl font-black mb-1.5 tracking-tight leading-tight">
+                  Tavsiyalar markazi
+                </h1>
+                <p className="text-emerald-50/90 text-[12px] md:text-base font-medium opacity-90 max-w-2xl leading-snug">
                   Sizning yeringiz uchun qishloq xo'jaligi ekspertlaridan turli xil ilg'or tavsiyalar va yechimlar markazi.
                 </p>
               </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl opacity-50"></div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/5 rounded-full -ml-10 -mb-10 blur-xl opacity-30"></div>
             </div>
 
-            {/* Modules Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
               {/* Module Card: AI Planner */}
               <button
                 onClick={() => setActiveModule('ai_planner')}
-                className="group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 hover:border-primary-200 transition-all hover:shadow-primary-600/5 relative overflow-hidden active:scale-95"
+                className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-emerald-500 shadow-xl shadow-gray-200/50 hover:shadow-emerald-600/10 transition-all hover:-translate-y-1 relative overflow-hidden active:scale-[0.98]"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50/50 rounded-bl-full -z-10 group-hover:bg-primary-50 transition-colors"></div>
-                <div className="bg-primary-50 p-3 rounded-2xl text-primary-600 border border-primary-100 group-hover:scale-110 transition-transform">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/30 rounded-bl-full -z-10 group-hover:bg-emerald-50/50 transition-colors"></div>
+                <div className="bg-emerald-50 p-3 rounded-2xl text-emerald-600 border border-emerald-100 group-hover:scale-110 transition-transform shadow-sm">
                   <Brain className="w-7 h-7" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-                    AI Agronom <span className="bg-primary-100 text-primary-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Yangi</span>
+                <div className="space-y-1.5">
+                  <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                    AI Agronom <span className="bg-emerald-100 text-emerald-700 text-[10px] uppercase font-black px-2.5 py-1 rounded-full tracking-widest">Yangi</span>
                   </h3>
-                  <p className="text-[14px] text-gray-500 leading-relaxed h-12">
-                    Sun'iy intellekt yordamida yeringizga eng mos va serdaromad ekinlarni aniqlang.
-                  </p>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Sun'iy intellekt yordamida yeringizga eng mos va serdaromad ekinlarni aniqlang.</p>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-sm font-bold text-primary-600 group-hover:text-primary-700">
+                <div className="mt-2 flex items-center gap-2 text-sm font-black text-emerald-600 group-hover:text-emerald-700 transition-colors">
                   Ishga tushirish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
 
-              {/* Placeholder Module 2 */}
-              <div className="opacity-60 cursor-not-allowed group text-left card-premium p-6 md:p-8 flex flex-col items-start gap-4 border-dashed relative overflow-hidden">
-                <div className="bg-gray-100 p-3 rounded-2xl text-gray-400 border border-gray-200">
-                  <BarChart3 className="w-7 h-7" />
+              {/* Module Card: Market Analysis */}
+              <button
+                onClick={() => setActiveModule('market_analysis')}
+                className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-blue-500 shadow-xl shadow-gray-200/50 hover:shadow-blue-600/10 transition-all hover:-translate-y-1 relative overflow-hidden active:scale-[0.98]"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/30 rounded-bl-full -z-10 group-hover:bg-blue-50/50 transition-colors"></div>
+                <div className="bg-blue-50 p-3 rounded-2xl text-blue-600 border border-blue-100 group-hover:scale-110 transition-transform shadow-sm">
+                  <ShoppingCart className="w-7 h-7" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Hosildorlik Tahlili</h3>
-                  <p className="text-[14px] text-gray-500 leading-relaxed h-12">
-                    O'tgan yillardagi hosil ma'lumotlaringiz asosida kelajak prognozlari.
-                  </p>
+                <div className="space-y-1.5">
+                  <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                     Bozor Tahlili <span className="bg-blue-100 text-blue-700 text-[10px] uppercase font-black px-2 py-1 rounded-full tracking-widest">PRO</span>
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Yilik mahsulotlar ishlab chiqarish va bozor talabi muvozanatini kuzating.</p>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-sm font-bold text-gray-400">
-                  Tez orada
+                <div className="mt-2 flex items-center gap-2 text-sm font-black text-blue-600 group-hover:text-blue-700 transition-colors">
+                  Tahlilni ko'rish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+
+              {/* Module Card: Disease Management */}
+              <button
+                onClick={() => setActiveModule('disease_management')}
+                className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-rose-500 shadow-xl shadow-gray-200/50 hover:shadow-rose-600/10 transition-all hover:-translate-y-1 relative overflow-hidden active:scale-[0.98]"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50/30 rounded-bl-full -z-10 group-hover:bg-rose-50/50 transition-colors"></div>
+                <div className="bg-rose-50 p-3 rounded-2xl text-rose-600 border border-rose-100 group-hover:scale-110 transition-transform shadow-sm">
+                  <ShieldAlert className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                     Kasalliklar <span className="bg-rose-100 text-rose-700 text-[10px] uppercase font-black px-2.5 py-1 rounded-full tracking-widest text-center min-w-[70px]">AI Diagnoz</span>
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Ekinlaringizdagi kasallik va zararkunandalarni AI yordamida aniqlang.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-black text-rose-600 group-hover:text-rose-700 transition-colors">
+                  Diagnozni boshlash <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+
+              {/* Module Card: Agro Marketplace */}
+              <button
+                onClick={() => window.open('https://agrom24.uz', '_blank')}
+                className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-violet-500 shadow-xl shadow-gray-200/50 hover:shadow-violet-600/10 transition-all hover:-translate-y-1 relative overflow-hidden active:scale-[0.98]"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-violet-50/30 rounded-bl-full -z-10 group-hover:bg-violet-100/50 transition-colors"></div>
+                <div className="bg-violet-50 p-3 rounded-2xl text-violet-600 border border-violet-100 group-hover:scale-110 transition-transform shadow-sm">
+                  <ShoppingBag className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                      Agro Marketplace <span className="bg-violet-100 text-violet-700 text-[10px] uppercase font-black px-2.5 py-1 rounded-full tracking-widest">Bozor</span>
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Mahsulotlarni to'g'ridan-to'g'ri sotish va sotib olish milliy platformasi.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-black text-violet-600 group-hover:text-violet-700 transition-colors">
+                  Bozorga kirish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+
+              {/* Module Card: Equipment Rental */}
+              <div className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-indigo-500 shadow-xl shadow-gray-200/50 opacity-80 cursor-not-allowed relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-24 h-24 bg-indigo-50/30 rounded-full blur-2xl -z-10"></div>
+                <div className="bg-indigo-50 p-3 rounded-2xl text-indigo-600 border border-indigo-100 shadow-sm">
+                  <Truck className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900">Texnika ijarasi</h3>
+                    <span className="bg-indigo-100 text-indigo-700 text-[9px] uppercase font-black px-2 py-0.5 rounded-full tracking-wider">Tez orada</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Zamonaviy qishloq xo'jaligi texnikalarini ijara qilish tizimi.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-bold text-gray-400">
+                   Yaqinda ishga tushadi
+                </div>
+              </div>
+
+              {/* Module Card: Farmers Community */}
+              <div className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-teal-500 shadow-xl shadow-gray-200/50 opacity-80 cursor-not-allowed relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-24 h-24 bg-teal-50/30 rounded-full blur-2xl -z-10"></div>
+                <div className="bg-teal-50 p-3 rounded-2xl text-teal-600 border border-teal-100 shadow-sm">
+                  <Users className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900">Fermerlar hamjamiyati</h3>
+                    <span className="bg-teal-100 text-teal-700 text-[9px] uppercase font-black px-2 py-0.5 rounded-full tracking-wider">Tez orada</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Tajriba almashish va mutaxassislar bilan muloqot markazi.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-bold text-gray-400">
+                   Yaqinda ishga tushadi
+                </div>
+              </div>
+
+              {/* Module Card: Agro News */}
+              <div className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-amber-500 shadow-xl shadow-gray-200/50 opacity-80 cursor-not-allowed relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-24 h-24 bg-amber-50/30 rounded-full blur-2xl -z-10"></div>
+                <div className="bg-amber-50 p-3 rounded-2xl text-amber-600 border border-amber-100 shadow-sm">
+                  <Newspaper className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900">Agro yangiliklar</h3>
+                    <span className="bg-amber-100 text-amber-700 text-[9px] uppercase font-black px-2 py-0.5 rounded-full tracking-wider">Tez orada</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Qishloq xo'jaligi sohasidagi so'nggi xabarlar va texnologiyalar.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-bold text-gray-400">
+                   Yaqinda ishga tushadi
+                </div>
+              </div>
+
+              {/* Module Card: Real-time alert system */}
+              <div className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-yellow-500 shadow-xl shadow-gray-200/50 opacity-80 cursor-not-allowed relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-24 h-24 bg-yellow-50/30 rounded-full blur-2xl -z-10"></div>
+                <div className="bg-yellow-50 p-3 rounded-2xl text-yellow-600 border border-yellow-100 shadow-sm">
+                  <Bell className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900">Real-time alerts</h3>
+                    <span className="bg-yellow-100 text-yellow-700 text-[9px] uppercase font-black px-2 py-0.5 rounded-full tracking-wider">Tez orada</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Ob-havo va zararkunandalar haqida tezkor xabarnomalar.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-bold text-gray-400">
+                   Yaqinda ishga tushadi
+                </div>
+              </div>
+
+              {/* Module Card: Qarz / Invest */}
+              <div className="group text-left bg-white rounded-[2rem] p-6 md:p-7 flex flex-col items-start gap-4 border-l-4 border-emerald-600 shadow-xl shadow-gray-200/50 opacity-80 cursor-not-allowed relative overflow-hidden">
+                <div className="absolute top-0 right-10 w-24 h-24 bg-emerald-50/30 rounded-full blur-2xl -z-10"></div>
+                <div className="bg-emerald-50 p-3 rounded-2xl text-emerald-600 border border-emerald-100 shadow-sm">
+                  <Banknote className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black text-gray-900">Qarz / Invest</h3>
+                    <span className="bg-emerald-100 text-emerald-700 text-[9px] uppercase font-black px-2 py-0.5 rounded-full tracking-wider">Tez orada</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Agrosanoat uchun moliyaviy yordam va investitsiyalar.</p>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-sm font-bold text-gray-400">
+                   Yaqinda ishga tushadi
                 </div>
               </div>
 
             </div>
           </motion.div>
-        </AnimatePresence>
-      )}
-
-      {activeModule === 'ai_planner' && (
-        <AIPlannerModule onBack={() => setActiveModule(null)} />
-      )}
-
+        ) : activeModule === 'ai_planner' ? (
+          <motion.div key="ai_planner" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+             <AIPlannerModule onBack={() => setActiveModule(null)} />
+          </motion.div>
+        ) : activeModule === 'market_analysis' ? (
+          <motion.div key="market_analysis" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+             <MarketAnalysisModule onBack={() => setActiveModule(null)} />
+          </motion.div>
+        ) : (
+          <motion.div key="disease_management" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+             <DiseaseManagementModule onBack={() => setActiveModule(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
