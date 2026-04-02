@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import {
   MapPin, Layers, Sparkles, Droplet, Brain,
   ChevronDown, AlertTriangle, CheckCircle2, TrendingUp,
-  Wind, Sprout, Wallet, Activity, Loader2, ArrowLeft, BarChart3, ChevronRight
+  Wind, Sprout, Wallet, Activity, Loader2, ArrowLeft, BarChart3, ChevronRight,
+  Wheat, Leaf, FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -109,6 +110,9 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [yerHajmi, setYerHajmi] = useState<string>('25');
   const [tuproqTuri, setTuproqTuri] = useState('Qumloq');
   const [suvMavjudligi, setSuvMavjudligi] = useState('');
+  const [oldingiHosil, setOldingiHosil] = useState('');
+  const [urugNavi, setUrugNavi] = useState('');
+  const [qoshimchaMalumot, setQoshimchaMalumot] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<AICropResult[] | null>(null);
@@ -129,7 +133,10 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         hudud,
         yer_hajmi: Number(yerHajmi),
         tuproq_turi: tuproqTuri,
-        suv_mavjudligi: suvMavjudligi
+        suv_mavjudligi: suvMavjudligi,
+        ...(oldingiHosil.trim() && { oldingi_hosil: oldingiHosil.trim() }),
+        ...(urugNavi.trim() && { urug_t: urugNavi.trim() }),
+        ...(qoshimchaMalumot.trim() && { qoshimcha_malumot: qoshimchaMalumot.trim() }),
       });
       let data = res.data?.recommendations || res.data?.plan || res.data;
       if (typeof data === 'string') {
@@ -249,6 +256,51 @@ const AIPlannerModule: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Oldingi Hosil */}
+              <div>
+                <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
+                  <Wheat className="w-4 h-4 text-primary-600" /> Oldingi hosil
+                  <span className="ml-auto text-[11px] font-normal text-gray-400">Ixtiyoriy</span>
+                </label>
+                <input
+                  type="text"
+                  value={oldingiHosil}
+                  onChange={(e) => setOldingiHosil(e.target.value)}
+                  placeholder="Masalan: g'o'za, bug'doy, pomidor"
+                  className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] placeholder:text-gray-300"
+                />
+              </div>
+
+              {/* Urug' Navi */}
+              <div>
+                <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
+                  <Leaf className="w-4 h-4 text-primary-600" /> Urug' navi
+                  <span className="ml-auto text-[11px] font-normal text-gray-400">Ixtiyoriy</span>
+                </label>
+                <input
+                  type="text"
+                  value={urugNavi}
+                  onChange={(e) => setUrugNavi(e.target.value)}
+                  placeholder="Masalan: F1, mahalliy nav, Uzbek-2"
+                  className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] placeholder:text-gray-300"
+                />
+              </div>
+
+              {/* Qo'shimcha ma'lumotlar */}
+              <div>
+                <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-700 mb-2.5">
+                  <FileText className="w-4 h-4 text-primary-600" /> Qo'shimcha ma'lumotlar
+                  <span className="ml-auto text-[11px] font-normal text-gray-400">Ixtiyoriy</span>
+                </label>
+                <textarea
+                  value={qoshimchaMalumot}
+                  onChange={(e) => setQoshimchaMalumot(e.target.value)}
+                  placeholder="Qishloq sharoiti, maqsad bozor, yer holati yoki boshqa muhim ma'lumotlar..."
+                  rows={3}
+                  className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-medium text-gray-800 text-[14px] resize-none placeholder:text-gray-300 leading-relaxed"
+                />
               </div>
 
               {error && (
